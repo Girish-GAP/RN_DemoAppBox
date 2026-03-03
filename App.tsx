@@ -13,12 +13,18 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 import { initializeStorage } from './src/storage/initStorage';
+import { initializeDatabase } from './src/storage/database';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
   useEffect(() => {
-    initializeStorage();
+    async function init() {
+      await initializeStorage();
+      await initializeDatabase();
+    }
+
+    init();
   }, []);
 
   return (
