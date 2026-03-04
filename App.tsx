@@ -14,9 +14,17 @@ import {
 } from 'react-native-safe-area-context';
 import { initializeStorage } from './src/storage/initStorage';
 import { initializeDatabase } from './src/storage/database';
+import * as crypto from 'react-native-quick-crypto';
+import { generateSalt, deriveKey } from './src/security/crypto';
+import { createMasterKey, verifyPassword } from './src/security/masterKey';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
+
+  useEffect(() => {
+    const random = crypto.randomBytes(16);
+    console.log('Random bytes:', random.toString('hex'));
+  }, []);
 
   useEffect(() => {
     async function init() {
@@ -25,6 +33,30 @@ function App() {
     }
 
     init();
+  }, []);
+
+  useEffect(() => {
+    const password = 'test123';
+
+    const salt = generateSalt();
+    const key = deriveKey(password, salt);
+
+    console.log('Salt:', salt.toString('hex'));
+    console.log('Key:', key.toString('hex'));
+  }, []);
+
+  useEffect(() => {
+    createMasterKey('test123');
+  }, []);
+
+  useEffect(() => {
+    async function test() {
+      const ok = await verifyPassword('test123');
+
+      console.log('Password correct:', ok);
+    }
+
+    test();
   }, []);
 
   return (

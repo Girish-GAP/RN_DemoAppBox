@@ -19,6 +19,8 @@
     "react-native-fs": "^2.20.0",
     "react-native-nitro-modules": "^0.34.1",
     "react-native-nitro-sqlite": "^9.4.0",
+    "react-native-quick-base64": "^2.2.2",
+    "react-native-quick-crypto": "^1.0.15",
     "react-native-safe-area-context": "^5.5.2"
   },
   "devDependencies": {
