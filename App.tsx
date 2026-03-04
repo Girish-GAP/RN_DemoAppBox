@@ -26,66 +26,39 @@ import { saveEncryptedImage } from './src/storage/imageVault';
 import VaultGallery from './src/screens/VaultGallery';
 import { VAULT_PATH } from './src/storage/paths';
 import RNFS from 'react-native-fs';
+import UnlockScreen from './src/screens/UnlockScreen';
+import CreateVaultScreen from './src/screens/CreateVaultScreen';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
   const [key, setKey] = useState<any>(null);
+  const [vaultExists, setVaultExists] = useState(false);
 
   useEffect(() => {
     async function init() {
-      //1️ Ensure folders exist
       await initializeStorage();
-
-      // 2 Initialize DB
       await initializeDatabase();
 
       const masterPath = `${VAULT_PATH}/master.key.enc`;
 
       const exists = await RNFS.exists(masterPath);
 
-      if (!exists) {
-        console.log('Creating new vault');
-        await createMasterKey('test123');
-      }
-
-      const vaultKey = await unlockVault('test123');
-
-      setKey(vaultKey);
+      setVaultExists(exists);
     }
 
     init();
   }, []);
 
+  if (!vaultExists) {
+    return <CreateVaultScreen onCreated={() => setVaultExists(true)} />;
+  }
+
   if (!key) {
-    return (
-      <SafeAreaProvider>
-        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-        <AppContent />
-      </SafeAreaProvider>
-    );
+    return <UnlockScreen onUnlock={setKey} />;
   }
 
   return <VaultGallery vaultKey={key} />;
 }
-
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
 
 export default App;
