@@ -12,6 +12,7 @@ import { getPhotos } from '../storage/database';
 import { loadEncryptedImage } from '../storage/loadEncryptedImage';
 import { pickImages } from '../media/pickImage';
 import { saveEncryptedImage } from '../storage/imageVault';
+import VaultImageItem from '../components/VaultImageItem';
 
 const size = Dimensions.get('window').width / 3;
 
@@ -59,14 +60,7 @@ export default function VaultGallery({ vaultKey }: any) {
         numColumns={3}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
-          <View style={{ width: size, height: size }}>
-            {images[item.fileName] && (
-              <Image
-                source={{ uri: images[item.fileName] }}
-                style={{ width: size, height: size }}
-              />
-            )}
-          </View>
+          <VaultImageItem fileName={item.fileName} vaultKey={vaultKey} />
         )}
       />
 
