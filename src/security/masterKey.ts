@@ -66,3 +66,39 @@ export async function verifyPassword(password: string) {
         return false
     }
 }
+
+
+export async function unlockVault(password: string) {
+
+    const path = `${VAULT_PATH}/master.key.enc`
+
+    const content = await RNFS.readFile(path, 'utf8')
+
+    const data = JSON.parse(content)
+
+    const salt = crypto.Buffer.from(data.salt, 'base64')
+
+    const iv = crypto.Buffer.from(data.iv, 'base64')
+
+    const authTag = crypto.Buffer.from(data.authTag, 'base64')
+
+    const ciphertext = crypto.Buffer.from(data.ciphertext, 'base64')
+
+    const key = deriveKey(password, salt)
+
+    try {
+
+        decryptMasterSecret(
+            key,
+            iv,
+            authTag,
+            ciphertext
+        )
+
+        return key
+
+    } catch {
+
+        return null
+    }
+}

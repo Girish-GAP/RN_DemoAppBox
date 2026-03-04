@@ -2,6 +2,7 @@ import RNFS from 'react-native-fs'
 import * as crypto from 'react-native-quick-crypto'
 import { IMAGES_PATH } from './paths'
 import { encryptImage } from '../security/crypto'
+import { insertPhoto } from './database'
 
 export async function saveEncryptedImage(
     key: crypto.Buffer,
@@ -32,6 +33,8 @@ export async function saveEncryptedImage(
         JSON.stringify(payload),
         'utf8'
     )
+
+    await insertPhoto(fileName)
 
     return fileName
 }

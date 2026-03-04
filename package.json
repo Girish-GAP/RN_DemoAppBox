@@ -17,6 +17,7 @@
     "react": "19.2.3",
     "react-native": "0.84.1",
     "react-native-fs": "^2.20.0",
+    "react-native-image-picker": "^8.2.1",
     "react-native-nitro-modules": "^0.34.1",
     "react-native-nitro-sqlite": "^9.4.0",
     "react-native-quick-base64": "^2.2.2",
