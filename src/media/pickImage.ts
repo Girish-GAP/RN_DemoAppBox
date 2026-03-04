@@ -1,23 +1,22 @@
 import { launchImageLibrary } from 'react-native-image-picker'
 
-export async function pickImage() {
+export async function pickImages() {
 
     const result = await launchImageLibrary({
         mediaType: 'photo',
-        selectionLimit: 1,
+        selectionLimit: 0, // unlimited
         includeBase64: false
     })
 
     if (result.didCancel) {
-        return null
+        return []
     }
 
     if (result.errorCode) {
-        console.log("ImagePicker Error:", result.errorMessage)
-        return null
+        console.log("ImagePicker error:", result.errorMessage)
+        return []
     }
 
-    const asset = result.assets?.[0]
+    return result.assets ?? []
 
-    return asset?.uri ?? null
 }

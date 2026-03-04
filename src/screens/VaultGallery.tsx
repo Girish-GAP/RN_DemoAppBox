@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { getPhotos } from '../storage/database';
 import { loadEncryptedImage } from '../storage/loadEncryptedImage';
-import { pickImage } from '../media/pickImage';
+import { pickImages } from '../media/pickImage';
 import { saveEncryptedImage } from '../storage/imageVault';
 
 const size = Dimensions.get('window').width / 3;
@@ -39,11 +39,15 @@ export default function VaultGallery({ vaultKey }: any) {
   }, []);
 
   async function addPhoto() {
-    const uri = await pickImage();
+    const images = await pickImages();
 
-    if (!uri) return;
+    if (!images.length) return;
 
-    await saveEncryptedImage(vaultKey, uri);
+    for (const image of images) {
+      if (!image.uri) continue;
+
+      await saveEncryptedImage(vaultKey, image.uri);
+    }
 
     await loadGallery();
   }

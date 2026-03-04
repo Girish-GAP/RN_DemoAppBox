@@ -7,7 +7,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import {
+  StatusBar,
+  StyleSheet,
+  useColorScheme,
+  View,
+  AppState,
+} from 'react-native';
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
@@ -34,6 +40,28 @@ function App() {
 
   const [key, setKey] = useState<any>(null);
   const [vaultExists, setVaultExists] = useState(false);
+
+  const [appState, setAppState] = useState(AppState.currentState);
+
+  // Auto Lock Vault on background
+  useEffect(() => {
+    const blurSub = AppState.addEventListener('blur', () => {
+      console.log('Vault locked (blur)');
+      setKey(null);
+    });
+
+    const changeSub = AppState.addEventListener('change', state => {
+      if (state !== 'active') {
+        console.log('Vault locked (background)');
+        setKey(null);
+      }
+    });
+
+    return () => {
+      blurSub.remove();
+      changeSub.remove();
+    };
+  }, []);
 
   useEffect(() => {
     async function init() {
