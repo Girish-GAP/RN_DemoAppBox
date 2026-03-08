@@ -7,7 +7,6 @@ const size = Dimensions.get('window').width / 3;
 export default function VaultImageItem({ fileName, vaultKey }: any) {
   const [uri, setUri] = useState<string | null>(null);
 
-  // undserstand this behaviour later
   useEffect(() => {
     let mounted = true;
 
@@ -24,7 +23,7 @@ export default function VaultImageItem({ fileName, vaultKey }: any) {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [fileName]);
 
   return (
     <View style={{ width: size, height: size }}>

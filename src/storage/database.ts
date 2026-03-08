@@ -63,3 +63,13 @@ export async function getPhotos() {
 
   return result.rows._array;
 }
+
+
+export async function deletePhotoFromDB(id: string) {
+  const database = getDatabase();
+
+  await database.executeAsync(
+    `DELETE FROM photos WHERE id = ?`,
+    [id]
+  );
+}
