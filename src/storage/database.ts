@@ -15,33 +15,27 @@ export async function initializeDatabase() {
   await database.executeAsync(`
     CREATE TABLE IF NOT EXISTS photos (
       id TEXT PRIMARY KEY,
-      fileName TEXT,
-      encryptedMetadata TEXT,
       createdAt INTEGER,
       updatedAt INTEGER,
-      syncStatus TEXT
+      source TEXT,
+      encryptedMetadata TEXT
     );
   `);
 
   console.log('Photos table ready');
 }
 
-
-export async function insertPhoto(fileName: string) {
+export async function insertPhoto(id: string) {
 
   const database = getDatabase()
-
-  const id = Date.now().toString()
 
   const createdAt = Date.now()
 
   await database.executeAsync(
-    `INSERT INTO photos
-      (id, fileName, createdAt, updatedAt, syncStatus)
-     VALUES (?, ?, ?, ?, ?)`,
+    `INSERT INTO photos (id, createdAt, updatedAt, source)
+     VALUES (?, ?, ?, ?)`,
     [
       id,
-      fileName,
       createdAt,
       createdAt,
       'local'

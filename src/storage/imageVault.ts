@@ -1,40 +1,58 @@
 import RNFS from 'react-native-fs'
-import * as crypto from 'react-native-quick-crypto'
+import ImageResizer from '@bam.tech/react-native-image-resizer'
+import { encryptAndSave } from './encryptAndSave'
 import { IMAGES_PATH } from './paths'
-import { encryptImage } from '../security/crypto'
 import { insertPhoto } from './database'
+import { Buffer } from 'react-native-quick-crypto'
 
-export async function saveEncryptedImage(
-    key: crypto.Buffer,
-    imagePath: string
-) {
+export async function saveEncryptedImage(vaultKey: Buffer, uri: string) {
 
-    const data = await RNFS.readFile(
-        imagePath,
-        'base64'
-    )
+    const createdAt = Date.now()
+    const id = `${createdAt}-${Math.random().toString(36).slice(2, 8)}`
 
-    const buffer = crypto.Buffer.from(data, 'base64')
+    const imageFolder = `${IMAGES_PATH}/${id}`
 
-    const encrypted = encryptImage(key, buffer)
+    let thumb: any = null
 
-    const payload = {
-        iv: encrypted.iv.toString('base64'),
-        authTag: encrypted.authTag.toString('base64'),
-        ciphertext: encrypted.ciphertext.toString('base64')
+    try {
+
+        await RNFS.mkdir(imageFolder)
+
+        // create thumbnail
+        thumb = await ImageResizer.createResizedImage(
+            uri,
+            300,
+            300,
+            'JPEG',
+            70
+        )
+
+        const fullPath = `${imageFolder}/full.enc`
+        const thumbPath = `${imageFolder}/thumb.enc`
+
+        // encrypt full image
+        await encryptAndSave(uri, fullPath, vaultKey)
+
+        // encrypt thumbnail
+        await encryptAndSave(thumb.uri, thumbPath, vaultKey)
+
+        await insertPhoto(id)
+
+        // delete temp thumbnail
+        if (thumb?.uri && await RNFS.exists(thumb.uri)) {
+            await RNFS.unlink(thumb.uri)
+        }
+
+    } catch (err) {
+
+        if (thumb?.uri && await RNFS.exists(thumb.uri)) {
+            await RNFS.unlink(thumb.uri).catch(() => { })
+        }
+
+        if (await RNFS.exists(imageFolder)) {
+            await RNFS.unlink(imageFolder).catch(() => { })
+        }
+
+        throw err
     }
-
-    const fileName = `${Date.now()}.enc`
-
-    const filePath = `${IMAGES_PATH}/${fileName}`
-
-    await RNFS.writeFile(
-        filePath,
-        JSON.stringify(payload),
-        'utf8'
-    )
-
-    await insertPhoto(fileName)
-
-    return fileName
 }

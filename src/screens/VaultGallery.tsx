@@ -115,11 +115,7 @@ export default function VaultGallery({ vaultKey }: any) {
             onLongPress={() => startSelection(item.id)}
             onPress={() => toggleSelection(item.id)}
           >
-            <VaultImageItem
-              fileName={item.fileName}
-              vaultKey={vaultKey}
-              id={item.id}
-            />
+            <VaultImageItem vaultKey={vaultKey} id={item.id} />
 
             {selected.has(item.id) && <View style={styles.selectedOverlay} />}
           </TouchableOpacity>
