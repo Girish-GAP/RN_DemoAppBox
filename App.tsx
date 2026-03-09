@@ -27,13 +27,14 @@ import {
   unlockVault,
   verifyPassword,
 } from './src/security/masterKey';
-import { pickImage } from './src/media/pickImage';
+import { pickImages } from './src/media/pickImage';
 import { saveEncryptedImage } from './src/storage/imageVault';
 import VaultGallery from './src/screens/VaultGallery';
 import { VAULT_PATH } from './src/storage/paths';
 import RNFS from 'react-native-fs';
 import UnlockScreen from './src/screens/UnlockScreen';
 import CreateVaultScreen from './src/screens/CreateVaultScreen';
+import { clearThumbnailCache } from './src/storage/loadEncryptedImage';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -41,20 +42,16 @@ function App() {
   const [key, setKey] = useState<any>(null);
   const [vaultExists, setVaultExists] = useState(false);
 
-  const [appState, setAppState] = useState(AppState.currentState);
-
-  // Auto Lock Vault on background
+  function lockVault() {
+    console.log('Vault locked ');
+    clearThumbnailCache();
+    setKey(null);
+  }
   useEffect(() => {
-    const blurSub = AppState.addEventListener('blur', () => {
-      console.log('Vault locked (blur)');
-      setKey(null);
-    });
+    const blurSub = AppState.addEventListener('blur', lockVault);
 
     const changeSub = AppState.addEventListener('change', state => {
-      if (state !== 'active') {
-        console.log('Vault locked (background)');
-        setKey(null);
-      }
+      if (state !== 'active') lockVault();
     });
 
     return () => {

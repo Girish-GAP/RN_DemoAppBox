@@ -2,10 +2,20 @@ import RNFS from 'react-native-fs'
 import * as crypto from 'react-native-quick-crypto'
 import { decryptImage } from '../security/crypto'
 
+const thumbnailCache = new Map<string, string>()
+
+export function clearThumbnailCache() {
+    thumbnailCache?.clear()
+}
+
 export async function loadEncryptedImage(
     key: crypto.Buffer,
     path: string
 ) {
+
+    if (thumbnailCache?.has(path)) {
+        return thumbnailCache.get(path)!
+    }
 
     const base64 = await RNFS.readFile(path, 'base64')
 
@@ -17,6 +27,9 @@ export async function loadEncryptedImage(
 
     const decrypted = decryptImage(key, iv, authTag, ciphertext)
 
-    return `data:image/jpeg;base64,${decrypted.toString('base64')}`
+    const uri = `data:image/jpeg;base64,${decrypted.toString('base64')}`
 
+    thumbnailCache.set(path, uri)
+
+    return uri
 }
