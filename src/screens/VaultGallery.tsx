@@ -104,6 +104,10 @@ export default function VaultGallery({ vaultKey }: any) {
     await loadGallery();
   }
 
+  function openImage(id: string) {
+    navigation.navigate('ImageViewer', { id });
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <FlatList
@@ -115,7 +119,11 @@ export default function VaultGallery({ vaultKey }: any) {
             onLongPress={() => startSelection(item.id)}
             onPress={() => toggleSelection(item.id)}
           >
-            <VaultImageItem vaultKey={vaultKey} id={item.id} />
+            <VaultImageItem
+              vaultKey={vaultKey}
+              id={item.id}
+              onOpen={openImage}
+            />
 
             {selected.has(item.id) && <View style={styles.selectedOverlay} />}
           </TouchableOpacity>
